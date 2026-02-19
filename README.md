@@ -27,6 +27,7 @@ chmod +x arch-ideps.sh
 Not:
 Rasa bu projede private bir intent tanilama (intent classification) servisi olarak kullanilir.
 Temel olarak metin tipinde veri alir ve JSON body ile beslenir.
+Intentler tek adimli olabilecegi gibi state machine benzeri cok adimli akislarda da kullanilabilir.
 
 Ornek intent parse istegi:
 
@@ -62,8 +63,43 @@ Ek ornekler:
 
 ```json
 {
-  "text": "Muzik ac ve sesi biraz azalt"
+  "text": "Once hayvanlari taniyalim, sonra bir quiz yapalim"
 }
+```
+
+Koddaki state machine ile uyumlu cok adimli intent akislari:
+
+1) Gorsel kart oyunu akisi (`visual_card_game_start` -> `VISUAL_GAME_START`)
+
+```text
+Kullanici: "Ekranda ne var oyunu oynayalim"
+Rasa intent: visual_card_game_start
+State gecisi: LISTENING -> VISUAL_GAME_START
+Robot: Rastgele 5 gorsel gosterir ve her tur sesli cevap bekler
+Kullanici (oyun icinde): "dur"
+Rasa intent: stop
+State gecisi: VISUAL_GAME_START -> SLEEPING
+```
+
+2) Kelime ceviri oyunu akisi (`start_translation_game` -> `TRANSLATION_GAME_START`)
+
+```text
+Kullanici: "Ceviri oyunu baslatalim"
+Rasa intent: start_translation_game
+State gecisi: LISTENING -> TRANSLATION_GAME_START
+Robot: 5 kelime sorar, her tur cevap alir
+Kullanici (oyun icinde): "stop"
+Rasa intent: stop
+State gecisi: TRANSLATION_GAME_START -> LISTENING
+```
+
+3) Onceki cevabi aciklatma akisi (`dont_understand_word` / `i_dont_know_any_word`)
+
+```text
+Adim 1: Robot bir cevap uretir ve bunu `last_response` olarak saklar
+Adim 2: Kullanici "anlamadim" benzeri bir ifade soyler
+Rasa intent: dont_understand_word (veya i_dont_know_any_word)
+Adim 3: Robot `last_response` metnini Turkceye cevirip tekrar seslendirir
 ```
 
 ## 2) Ortam Degiskenleri (.env)
