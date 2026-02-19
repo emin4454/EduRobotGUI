@@ -30,8 +30,16 @@ Note:
 In this project, Rasa is used as a private intent classification service.
 It basically receives text data and is sent with a JSON body.
 Intents can be single-step, or used in multi-step flows similar to a state machine.
+The code currently parses only these fields:
+- Intent request: `text`
+- Intent response: `intent.name`, `intent.confidence`
+- Webhook request: `sender`, `message`
+- Webhook response: first array item `text` (`[0].text`)
+- `recipient_id` is not parsed in the code.
 
-Example intent parse request:
+Example intent parse request/response:
+
+Request:
 
 ```json
 {
@@ -39,7 +47,22 @@ Example intent parse request:
 }
 ```
 
-Example webhook request:
+Response:
+
+```json
+{
+  "text": "How is the weather today?",
+  "intent": {
+    "name": "ask_weather",
+    "confidence": 0.98
+  },
+  "entities": []
+}
+```
+
+Example webhook request/response:
+
+Request:
 
 ```json
 {
@@ -48,17 +71,19 @@ Example webhook request:
 }
 ```
 
-Example payload where sender + intent are processed together:
+Response:
 
 ```json
-{
-  "sender": "user",
-  "text": "Let's start the translation game",
-  "intent": "start_translation_game"
-}
+[
+  {
+    "text": "Today's weather is mild and partly cloudy."
+  }
+]
 ```
 
-Additional examples:
+Additional request/response examples:
+
+Request:
 
 ```json
 {
@@ -66,11 +91,36 @@ Additional examples:
 }
 ```
 
+Response:
+
+```json
+{
+  "text": "Open a game about animals",
+  "intent": {
+    "name": "start_animal_game",
+    "confidence": 0.96
+  },
+  "entities": []
+}
+```
+
+Request:
+
 ```json
 {
   "sender": "user",
   "message": "Can you teach me colors in English?"
 }
+```
+
+Response:
+
+```json
+[
+  {
+    "text": "Of course. Let's start with basic colors: red, blue, and green."
+  }
+]
 ```
 
 Multi-step intent flows compatible with the state machine in the code:

@@ -30,8 +30,16 @@ Not:
 Rasa bu projede private bir intent tanilama (intent classification) servisi olarak kullanilir.
 Temel olarak metin tipinde veri alir ve JSON body ile gönderilir.
 Intentler tek adimli olabilecegi gibi state machine benzeri cok adimli akislarda da kullanilabilir.
+Kod tarafinda su alanlar parse edilir:
+- Intent istegi: `text`
+- Intent cevabi: `intent.name`, `intent.confidence`
+- Webhook istegi: `sender`, `message`
+- Webhook cevabi: dizinin ilk elemanindaki `text` (`[0].text`)
+- `recipient_id` kodda parse edilmiyor.
 
-Ornek intent parse istegi:
+Ornek intent parse istek/cevap:
+
+Istek:
 
 ```json
 {
@@ -39,7 +47,22 @@ Ornek intent parse istegi:
 }
 ```
 
-Ornek webhook istegi:
+Cevap:
+
+```json
+{
+  "text": "Bugun hava nasil?",
+  "intent": {
+    "name": "ask_weather",
+    "confidence": 0.98
+  },
+  "entities": []
+}
+```
+
+Ornek webhook istek/cevap:
+
+Istek:
 
 ```json
 {
@@ -48,17 +71,19 @@ Ornek webhook istegi:
 }
 ```
 
-Sender + intent birlikte islenecek ornek payload:
+Cevap:
 
 ```json
-{
-  "sender": "user",
-  "text": "Ceviri oyunu baslatalim",
-  "intent": "start_translation_game"
-}
+[
+  {
+    "text": "Bugun hava ilik ve parcali bulutlu."
+  }
+]
 ```
 
-Ek ornekler:
+Ek istek/cevap ornekleri:
+
+Istek:
 
 ```json
 {
@@ -66,11 +91,36 @@ Ek ornekler:
 }
 ```
 
+Cevap:
+
+```json
+{
+  "text": "Bana hayvanlar hakkinda bir oyun ac",
+  "intent": {
+    "name": "start_animal_game",
+    "confidence": 0.96
+  },
+  "entities": []
+}
+```
+
+Istek:
+
 ```json
 {
   "sender": "user",
   "message": "Ingilizce renkleri ogretir misin?"
 }
+```
+
+Cevap:
+
+```json
+[
+  {
+    "text": "Tabii. Temel renklerle baslayalim: red, blue ve green."
+  }
+]
 ```
 
 Koddaki state machine ile uyumlu cok adimli intent akislari:
