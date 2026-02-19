@@ -1,14 +1,16 @@
 # EduRobotGUI
 
-Bu repo, sesli etkileşimli bir robot akışını içerir. Proje temel olarak:
+This repository contains a voice-interactive robot workflow. The project mainly:
 
-- STT (speech-to-text) ile kullanıcıyı dinler
-- Rasa + LLM ile metin yanıtı üretir
-- TTS ile sesi oynatır
-- Ekran/animasyon bileşenleriyle durum gösterir
-- Veritabanından içerik alır
+- Listens to the user with STT (speech-to-text)
+- Produces text responses with Rasa + LLM
+- Plays audio with TTS
+- Displays state through screen/animation components
+- Retrieves content from a database
 
-## 1) Gereksinimler
+Its educational focus is to help Turkish-speaking children learn English through voice-based interaction and guided activities.
+
+## 1) Requirements
 
 ### Ubuntu
 
@@ -24,91 +26,91 @@ chmod +x arch-ideps.sh
 ./arch-ideps.sh
 ```
 
-Not:
-Rasa bu projede private bir intent tanilama (intent classification) servisi olarak kullanilir.
-Temel olarak metin tipinde veri alir ve JSON body ile gönderilir.
-Intentler tek adimli olabilecegi gibi state machine benzeri cok adimli akislarda da kullanilabilir.
+Note:
+In this project, Rasa is used as a private intent classification service.
+It basically receives text data and is sent with a JSON body.
+Intents can be single-step, or used in multi-step flows similar to a state machine.
 
-Ornek intent parse istegi:
+Example intent parse request:
 
 ```json
 {
-  "text": "Bugun hava nasil?"
+  "text": "How is the weather today?"
 }
 ```
 
-Ornek webhook istegi:
+Example webhook request:
 
 ```json
 {
   "sender": "user",
-  "message": "Bugun hava nasil?"
+  "message": "How is the weather today?"
 }
 ```
 
-Sender + intent birlikte islenecek ornek payload:
+Example payload where sender + intent are processed together:
 
 ```json
 {
   "sender": "user",
-  "text": "Ceviri oyunu baslatalim",
+  "text": "Let's start the translation game",
   "intent": "start_translation_game"
 }
 ```
 
-Ek ornekler:
+Additional examples:
 
 ```json
 {
-  "text": "Bana hayvanlar hakkinda bir oyun ac"
+  "text": "Open a game about animals"
 }
 ```
 
 ```json
 {
   "sender": "user",
-  "message": "Ingilizce renkleri ogretir misin?"
+  "message": "Can you teach me colors in English?"
 }
 ```
 
-Koddaki state machine ile uyumlu cok adimli intent akislari:
+Multi-step intent flows compatible with the state machine in the code:
 
-1. Gorsel kart oyunu akisi (`visual_card_game_start` -> `VISUAL_GAME_START`)
+1. Visual card game flow (`visual_card_game_start` -> `VISUAL_GAME_START`)
 
 ```text
-Kullanici: "Ekranda ne var oyunu oynayalim"
+User: "Let's play the what's on screen game"
 Rasa intent: visual_card_game_start
-State gecisi: LISTENING -> VISUAL_GAME_START
-Robot: Rastgele 5 gorsel gosterir ve her tur sesli cevap bekler
-Kullanici (oyun icinde): "dur"
+State transition: LISTENING -> VISUAL_GAME_START
+Robot: Shows 5 random visuals and waits for a spoken answer each round
+User (during the game): "stop"
 Rasa intent: stop
-State gecisi: VISUAL_GAME_START -> SLEEPING
+State transition: VISUAL_GAME_START -> SLEEPING
 ```
 
-2. Kelime ceviri oyunu akisi (`start_translation_game` -> `TRANSLATION_GAME_START`)
+2. Word translation game flow (`start_translation_game` -> `TRANSLATION_GAME_START`)
 
 ```text
-Kullanici: "Ceviri oyunu baslatalim"
+User: "Let's start the translation game"
 Rasa intent: start_translation_game
-State gecisi: LISTENING -> TRANSLATION_GAME_START
-Robot: 5 kelime sorar, her tur cevap alir
-Kullanici (oyun icinde): "stop"
+State transition: LISTENING -> TRANSLATION_GAME_START
+Robot: Asks 5 words and receives an answer each round
+User (during the game): "stop"
 Rasa intent: stop
-State gecisi: TRANSLATION_GAME_START -> LISTENING
+State transition: TRANSLATION_GAME_START -> LISTENING
 ```
 
-3. Onceki cevabi aciklatma akisi (`dont_understand_word` / `i_dont_know_any_word`)
+3. Previous answer explanation flow (`dont_understand_word` / `i_dont_know_any_word`)
 
 ```text
-Adim 1: Robot bir cevap uretir ve bunu `last_response` olarak saklar
-Adim 2: Kullanici "anlamadim" benzeri bir ifade soyler
-Rasa intent: dont_understand_word (veya i_dont_know_any_word)
-Adim 3: Robot `last_response` metnini Turkceye cevirip tekrar seslendirir
+Step 1: The robot generates an answer and stores it as `last_response`
+Step 2: The user says an expression similar to "I don't understand"
+Rasa intent: dont_understand_word (or i_dont_know_any_word)
+Step 3: The robot translates `last_response` to Turkish and speaks it again
 ```
 
-## 2) Ortam Degiskenleri (.env)
+## 2) Environment Variables (.env)
 
-`.env` icinde su alanlari doldur:
+Fill the following fields in `.env`:
 
 ```env
 DB_HOST=
@@ -131,53 +133,53 @@ SONIOX_API_KEY=
 RASA_BASE_URL=
 ```
 
-- API key bos ise ilgili servis calismaz
+- If an API key is empty, the related service will not run
 
-## 3) Build ve Calistirma
+## 3) Build and Run
 
 ```bash
 mkdir -p build
 cd build
 cmake ..
 make -j
-# alternatif:
+# alternative:
 # cmake --build . -j
 ./EduRobot
 ```
 
-## 4) Mimari Ozet
+## 4) Architecture Summary
 
-- `src/audio/stt/`: ses kaydi ve websocket STT akisi
-- `src/websocket/`: Soniox websocket istemcisi
-- `src/rasa/`: intent + webhook cagrilari
-- `src/chatbot/`: Gemini uzerinden LLM yanitlari
+- `src/audio/stt/`: audio capture and websocket STT flow
+- `src/websocket/`: Soniox websocket client
+- `src/rasa/`: intent + webhook calls
+- `src/chatbot/`: LLM responses via Gemini
 - `src/audio/tts/`: ElevenLabs TTS
-- `src/database/`: MySQL/MariaDB erisimi
-- `src/gui/`: ekran ve animasyon yonetimi
-- `src/helpers/`: ceviri, env yardimcilari, metin yardimcilari
+- `src/database/`: MySQL/MariaDB access
+- `src/gui/`: screen and animation management
+- `src/helpers/`: translation, env helpers, text helpers
 
-## 5) Hata Ayiklama
+## 5) Troubleshooting
 
-- Veritabani baglanamiyorsa:
-  - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME` degerlerini kontrol et.
-- Rasa donmuyorsa:
-  - `RASA_BASE_URL` ve Rasa servisinin ayakta oldugunu kontrol et.
-- STT baslamiyorsa:
-  - `SONIOX_API_KEY` degerini kontrol et.
-- TTS calismiyorsa:
-  - `ELEVENLABS_API_KEY` ve ses/model alanlarini kontrol et.
-- Build hatasi varsa:
-  - sistem bagimlilik scriptlerini tekrar calistir.
+- If the database cannot connect:
+  - Check `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME` values.
+- If Rasa does not respond:
+  - Check `RASA_BASE_URL` and that the Rasa service is running.
+- If STT does not start:
+  - Check the `SONIOX_API_KEY` value.
+- If TTS does not work:
+  - Check `ELEVENLABS_API_KEY` and voice/model fields.
+- If there is a build error:
+  - Run the system dependency scripts again.
 
-## 6) Proje Nasil Calisir
+## 6) How the Project Works
 
-Calisma akisi ozetle su sekilde:
+The workflow is summarized as follows:
 
-1. Program baslarken `.env` dosyasi yuklenir ve servis ayarlari okunur.
-2. Robot ses dinleme moduna gecer, mikrofon akisi STT tarafina gonderilir.
-3. STT sonucu metin olarak alinir ve kullanicinin ifadesi elde edilir.
-4. Metin once Rasa tarafinda intent analizi icin islenir.
-5. Rasa sonucu yetersizse/uygun degilse LLM (Gemini) ile yanit uretilir.
-6. Uretilen veya bulunan yanit TTS (ElevenLabs) ile sese cevrilir.
-7. Ses oynatilirken GUI durumu/animasyonlar guncellenir.
-8. Gerekli durumlarda DB'den soru-cevap veya gorsel icerik okunur.
+1. On startup, the `.env` file is loaded and service settings are read.
+2. The robot enters listening mode, and the microphone stream is sent to STT.
+3. STT output is received as text, and the user's utterance is obtained.
+4. The text is first processed by Rasa for intent analysis.
+5. If the Rasa result is insufficient/not suitable, a response is generated with the LLM (Gemini).
+6. The generated or found response is converted to speech with TTS (ElevenLabs).
+7. While audio is playing, GUI states/animations are updated.
+8. When needed, question-answer or visual content is read from the database.
