@@ -34,13 +34,18 @@ Kod tarafinda su alanlar parse edilir:
 - Intent istegi: `text`
 - Intent cevabi: `intent.name`, `intent.confidence`
 - Webhook istegi: `sender`, `message`
-- Webhook cevabi: dizinin ilk elemanindaki `text` (`[0].text`)
+- Webhook cevabi: donen elemanlar icindeki ilk uygun string `text`
 - `recipient_id` kodda parse edilmiyor.
+
+Onemli:
+- `/model/parse` cevabinin sekli Rasa surumune/pipeline'a gore degisebilir.
+- Bu projede zorunlu olan alanlar sadece `intent.name` ve `intent.confidence`.
+- Parse cevabinda kok seviyede `text` olmasi bu proje icin zorunlu degildir.
 
 Flow notu:
 1. Ilk olarak `/model/parse` endpoint'ine `{ "text": "..." }` ile istek atilir.
 2. Donen intent `nlu_fallback` degilse ve confidence `>= 0.50` ise, ekstra dogrudan cevap var mi diye `/webhooks/rest/webhook` endpoint'ine ikinci istek atilir.
-3. Webhook cevabi bir dizi doner ve ilk elemanda `text` varsa, bu deger Rasa'nin dogrudan cevabi olarak kullanilir.
+3. Webhook cevabinda herhangi bir elemanda string tipinde `text` varsa, bu deger Rasa'nin dogrudan cevabi olarak kullanilir.
 
 Ornek intent parse istek/cevap:
 
@@ -56,7 +61,6 @@ Cevap:
 
 ```json
 {
-  "text": "Bugun hava nasil?",
   "intent": {
     "name": "ask_weather",
     "confidence": 0.98
@@ -100,7 +104,6 @@ Cevap:
 
 ```json
 {
-  "text": "Bana hayvanlar hakkinda bir oyun ac",
   "intent": {
     "name": "start_animal_game",
     "confidence": 0.96

@@ -34,13 +34,18 @@ The code currently parses only these fields:
 - Intent request: `text`
 - Intent response: `intent.name`, `intent.confidence`
 - Webhook request: `sender`, `message`
-- Webhook response: first array item `text` (`[0].text`)
+- Webhook response: first available string `text` in response items
 - `recipient_id` is not parsed in the code.
+
+Important:
+- `/model/parse` response shape can vary by Rasa version/pipeline.
+- In this codebase, only `intent.name` and `intent.confidence` are required.
+- Root-level `text` in parse response is optional for this project.
 
 Flow note:
 1. First, a request is sent to `/model/parse` with `{ "text": "..." }`.
 2. If the returned intent is not `nlu_fallback` and confidence is `>= 0.50`, a second request is sent to `/webhooks/rest/webhook` to check whether there is an extra direct answer.
-3. If webhook returns an array and the first item has `text`, this value is used as Rasa's direct response.
+3. If webhook response contains a string `text` in any item, that value is used as Rasa's direct response.
 
 Example intent parse request/response:
 
@@ -56,7 +61,6 @@ Response:
 
 ```json
 {
-  "text": "How is the weather today?",
   "intent": {
     "name": "ask_weather",
     "confidence": 0.98
@@ -100,7 +104,6 @@ Response:
 
 ```json
 {
-  "text": "Open a game about animals",
   "intent": {
     "name": "start_animal_game",
     "confidence": 0.96

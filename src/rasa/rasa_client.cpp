@@ -22,6 +22,11 @@ std::string BuildRasaUrl(RasaRequestType::Type type)
     }
     return base_url + "/webhooks/rest/webhook";
 }
+
+bool ShouldSkipWebhook(const RasaResponse &result)
+{
+    return result.intent == "nlu_fallback" || result.confidence < 0.50f;
+}
 } // namespace
 
 size_t RasaClient::WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -35,20 +40,17 @@ RasaResponse RasaClient::AskRasa(const std::string &question)
 {
     nlohmann::json jRequest = {
         {"text", question}};
-    RasaResponse result = {"", 0, false, "", "", ""};
+    RasaResponse result = {"", 0, false, "", "", "", ""};
     PerformRequest(RasaRequestType::INTENT, jRequest, result);
     cout << result.confidence << " " << result.intent << endl;
-    if (result.intent == "nlu_fallback")
+    if (ShouldSkipWebhook(result))
     {
+        if (result.confidence < 0.50f)
+            gDisplay->setStatus("confidence degeri cok dusuk LLM e soruluyor");
         result.hasRasaResponse = false;
         return result;
     }
-    else if (result.confidence < 0.50f)
-    {
-        gDisplay->setStatus("confidence degeri cok dusuk LLM e soruluyor");
-        result.hasRasaResponse = false;
-        return result;
-    } // else
+
     gDisplay->setStatus("intent alındı şimdi ekstra cevap var mı bakılıyor");
     nlohmann::json jRequestWebhook = {
         {"sender", "user"},
@@ -61,14 +63,15 @@ RasaResponse RasaClient::AskRasa(const std::string &question)
 RasaResponse RasaClient::AskRasaJson(const nlohmann::json jRequest) // jRequest should contain text
 {
 
-    RasaResponse result = {"", 0, false, "", "", ""};
+    RasaResponse result = {"", 0, false, "", "", "", ""};
     PerformRequest(RasaRequestType::INTENT, jRequest, result);
     cout << result.confidence << " " << result.intent << endl;
-    if (result.intent == "nlu_fallback")
+    if (ShouldSkipWebhook(result))
     {
         result.hasRasaResponse = false;
         return result;
-    } // else
+    }
+
     nlohmann::json jRequestWebhook = {
         {"sender", "user"},
         {"message", jRequest["text"].get<string>()}};
@@ -83,6 +86,7 @@ void RasaClient::PerformRequest(RasaRequestType::Type type, const nlohmann::json
     if (!curl)
     {
         result.error = "curl cannot initialized ";
+        return;
     }
 
     string requestBody = jRequest.dump();
@@ -127,17 +131,25 @@ void RasaClient::PerformRequest(RasaRequestType::Type type, const nlohmann::json
             else
             {
                 result.rawWebHookResponse = responseString;
-                if (!jResponse.empty() && jResponse.front().contains("text"))
+
+                result.hasRasaResponse = false;
+                if (jResponse.is_array())
+                {
+                    for (const auto &item : jResponse)
+                    {
+                        if (item.is_object() && item.contains("text") && item["text"].is_string() && !item["text"].get<string>().empty())
+                        {
+                            result.hasRasaResponse = true;
+                            result.rasaResponse = item["text"].get<string>();
+                            break;
+                        }
+                    }
+                }
+                else if (jResponse.is_object() && jResponse.contains("text") && jResponse["text"].is_string())
                 {
                     result.hasRasaResponse = true;
-                    result.rasaResponse = jResponse.front()["text"]
-                                              .get<string>();
+                    result.rasaResponse = jResponse["text"].get<string>();
                 }
-                else
-                {
-                    result.hasRasaResponse = false;
-                }
-                return;
             }
         }
         catch (const exception &e)
@@ -149,4 +161,7 @@ void RasaClient::PerformRequest(RasaRequestType::Type type, const nlohmann::json
                 result.rawWebHookResponse = string("JSON parse hatası: ") + e.what();
         }
     }
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
 }
