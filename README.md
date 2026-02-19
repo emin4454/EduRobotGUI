@@ -1,7 +1,5 @@
 # EduRobotGUI
 
-# EduRobotCore
-
 Bu repo, sesli etkileşimli bir robot akışını içerir. Proje temel olarak:
 
 - STT (speech-to-text) ile kullanıcıyı dinler
@@ -57,7 +55,7 @@ Ek ornekler:
 
 ```json
 {
-  "sender": "student_42",
+  "sender": "user",
   "message": "Ingilizce renkleri ogretir misin?"
 }
 ```
@@ -69,8 +67,6 @@ Ek ornekler:
 ```
 
 ## 2) Ortam Degiskenleri (.env)
-
-Proje artik gizli bilgileri kod icinde tutmuyor. Tum API key ve DB baglanti bilgileri `.env` dosyasindan okunuyor.
 
 `.env` icinde su alanlari doldur:
 
@@ -95,9 +91,6 @@ SONIOX_API_KEY=
 RASA_BASE_URL=
 ```
 
-Notlar:
-
-- `RASA_BASE_URL` ornegi: `http://localhost:5005`
 - API key bos ise ilgili servis calismaz
 
 ## 3) Build ve Calistirma
