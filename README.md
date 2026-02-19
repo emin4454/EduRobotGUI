@@ -37,6 +37,11 @@ The code currently parses only these fields:
 - Webhook response: first array item `text` (`[0].text`)
 - `recipient_id` is not parsed in the code.
 
+Flow note:
+1. First, a request is sent to `/model/parse` with `{ "text": "..." }`.
+2. If the returned intent is not `nlu_fallback` and confidence is `>= 0.50`, a second request is sent to `/webhooks/rest/webhook` to check whether there is an extra direct answer.
+3. If webhook returns an array and the first item has `text`, this value is used as Rasa's direct response.
+
 Example intent parse request/response:
 
 Request:

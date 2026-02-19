@@ -37,6 +37,11 @@ Kod tarafinda su alanlar parse edilir:
 - Webhook cevabi: dizinin ilk elemanindaki `text` (`[0].text`)
 - `recipient_id` kodda parse edilmiyor.
 
+Flow notu:
+1. Ilk olarak `/model/parse` endpoint'ine `{ "text": "..." }` ile istek atilir.
+2. Donen intent `nlu_fallback` degilse ve confidence `>= 0.50` ise, ekstra dogrudan cevap var mi diye `/webhooks/rest/webhook` endpoint'ine ikinci istek atilir.
+3. Webhook cevabi bir dizi doner ve ilk elemanda `text` varsa, bu deger Rasa'nin dogrudan cevabi olarak kullanilir.
+
 Ornek intent parse istek/cevap:
 
 Istek:
