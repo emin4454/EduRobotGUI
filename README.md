@@ -26,7 +26,7 @@ chmod +x arch-ideps.sh
 
 Not:
 Rasa bu projede private bir intent tanilama (intent classification) servisi olarak kullanilir.
-Temel olarak metin tipinde veri alir ve JSON body ile beslenir.
+Temel olarak metin tipinde veri alir ve JSON body ile gönderilir.
 Intentler tek adimli olabilecegi gibi state machine benzeri cok adimli akislarda da kullanilabilir.
 
 Ornek intent parse istegi:
@@ -46,6 +46,16 @@ Ornek webhook istegi:
 }
 ```
 
+Sender + intent birlikte islenecek ornek payload:
+
+```json
+{
+  "sender": "user",
+  "text": "Ceviri oyunu baslatalim",
+  "intent": "start_translation_game"
+}
+```
+
 Ek ornekler:
 
 ```json
@@ -61,15 +71,9 @@ Ek ornekler:
 }
 ```
 
-```json
-{
-  "text": "Once hayvanlari taniyalim, sonra bir quiz yapalim"
-}
-```
-
 Koddaki state machine ile uyumlu cok adimli intent akislari:
 
-1) Gorsel kart oyunu akisi (`visual_card_game_start` -> `VISUAL_GAME_START`)
+1. Gorsel kart oyunu akisi (`visual_card_game_start` -> `VISUAL_GAME_START`)
 
 ```text
 Kullanici: "Ekranda ne var oyunu oynayalim"
@@ -81,7 +85,7 @@ Rasa intent: stop
 State gecisi: VISUAL_GAME_START -> SLEEPING
 ```
 
-2) Kelime ceviri oyunu akisi (`start_translation_game` -> `TRANSLATION_GAME_START`)
+2. Kelime ceviri oyunu akisi (`start_translation_game` -> `TRANSLATION_GAME_START`)
 
 ```text
 Kullanici: "Ceviri oyunu baslatalim"
@@ -93,7 +97,7 @@ Rasa intent: stop
 State gecisi: TRANSLATION_GAME_START -> LISTENING
 ```
 
-3) Onceki cevabi aciklatma akisi (`dont_understand_word` / `i_dont_know_any_word`)
+3. Onceki cevabi aciklatma akisi (`dont_understand_word` / `i_dont_know_any_word`)
 
 ```text
 Adim 1: Robot bir cevap uretir ve bunu `last_response` olarak saklar
