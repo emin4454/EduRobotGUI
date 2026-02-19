@@ -1,0 +1,109 @@
+{
+  "sentences": [
+    {
+      "id": 1,
+      "tense": "Simple Present",
+      "correct": "She works at a bank.",
+      "wrongs": "At a bank she works.",
+      "explanation": "Use simple present for habitual actions; in third-person singular add '-s' to the verb."
+    },
+    {
+      "id": 2,
+      "tense": "Simple Present",
+      "correct": "They play tennis on weekends.",
+      "wrongs": "Weekends they play tennis on.",
+      "explanation": "Use simple present to describe regular activities; plural subjects take the base verb."
+    },
+    {
+      "id": 3,
+      "tense": "Simple Present",
+      "correct": "He studies French every day.",
+      "wrongs": "Every day he studies French.",
+      "explanation": "Use simple present for repeated actions; verbs ending in 'y' after a consonant change to '-ies'."
+    },
+    {
+      "id": 4,
+      "tense": "Present Continuous",
+      "correct": "I am reading a book.",
+      "wrongs": "Am reading I a book.",
+      "explanation": "Use present continuous for actions happening now; form with 'am/are/is + verb-ing'."
+    },
+    {
+      "id": 5,
+      "tense": "Present Continuous",
+      "correct": "They are watching TV now.",
+      "wrongs": "Now are they watching TV.",
+      "explanation": "Use present continuous to describe ongoing actions; 'now' emphasizes the current moment."
+    },
+    {
+      "id": 6,
+      "tense": "Present Continuous",
+      "correct": "He is cooking dinner.",
+      "wrongs": "Is he cooking dinner.",
+      "explanation": "Use present continuous for in-progress actions; use 'is' with third-person singular."
+    },
+    {
+      "id": 7,
+      "tense": "Simple Past",
+      "correct": "I visited Paris last year.",
+      "wrongs": "Paris visited last year I.",
+      "explanation": "Use simple past for completed actions in the past; regular verbs add '-ed'."
+    },
+    {
+      "id": 8,
+      "tense": "Simple Past",
+      "correct": "She finished her homework yesterday.",
+      "wrongs": "Her she finished homework yesterday.",
+      "explanation": "Use simple past to talk about past events; adverbs like 'yesterday' indicate time."
+    },
+    {
+      "id": 9,
+      "tense": "Simple Past",
+      "correct": "They watched a movie last night.",
+      "wrongs": "Movie they watched a last night.",
+      "explanation": "Use simple past for actions completed at a specific past time; regular verbs take '-ed'."
+    },
+    {
+      "id": 10,
+      "tense": "Past Continuous",
+      "correct": "I was reading when she called.",
+      "wrongs": "When she I was reading called.",
+      "explanation": "Use past continuous for actions in progress in the past; 'was/were + verb-ing'."
+    },
+    {
+      "id": 11,
+      "tense": "Past Continuous",
+      "correct": "They were playing football at 5 pm.",
+      "wrongs": "At 5 pm they playing were football.",
+      "explanation": "Use past continuous to describe an ongoing past action at a specific time."
+    },
+    {
+      "id": 12,
+      "tense": "Past Continuous",
+      "correct": "He was sleeping during the lecture.",
+      "wrongs": "During the lecture sleeping he was.",
+      "explanation": "Use past continuous for background actions in the past; use 'was' with third-person singular."
+    },
+    {
+      "id": 13,
+      "tense": "Future Simple",
+      "correct": "I will travel to Spain next summer.",
+      "wrongs": "To Spain will I travel next summer.",
+      "explanation": "Use 'will + base verb' to talk about future plans or predictions."
+    },
+    {
+      "id": 14,
+      "tense": "Future Simple",
+      "correct": "She will start her new job tomorrow.",
+      "wrongs": "Will start she her new job tomorrow.",
+      "explanation": "Use future simple for future events; place 'will' before the subject for statements."
+    },
+    {
+      "id": 15,
+      "tense": "Future Simple",
+      "correct": "They will celebrate their anniversary.",
+      "wrongs": "Their celebrate they will anniversary.",
+      "explanation": "Use 'will + verb' to describe future celebrations or plans."
+    }
+  ]
+}
